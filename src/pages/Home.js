@@ -52,7 +52,7 @@ const Home = () => {
                         placeholder="Room ID"
                         onChange={(e)=>setRoomId(e.target.value)}
                         value={roomId}
-                        // onKeyUp={handleInputEnter}
+                        onKeyUp={handleInputEnter}
                     />
                     <input 
                         type="text" 

@@ -23,6 +23,10 @@ const EditorPage = () => {
   }
   
   useEffect(()=>{
+    if (socketRef.current) {
+      // Socket already exists, no need to initialize again
+      return;
+    }
     const init = async () => {
       socketRef.current = await initSocket();
 
@@ -44,6 +48,7 @@ const EditorPage = () => {
             console.log(`${userName} joined`);
           }
           setClients(clients);
+          // console.log(clients);
         }
       );
 
@@ -68,8 +73,6 @@ const EditorPage = () => {
       }
     }
   },[]);
-  
-  
 
   if(!location.state){
     return <Navigate to = "/" /> ;
@@ -95,7 +98,7 @@ const EditorPage = () => {
         <button className = 'btn leaveBtn'>Leave</button>
       </div>
       <div className='editorWrap'>
-        <Editor/>
+        <Editor socketRef = {socketRef} roomId = {roomId}/>
       </div>
     </div>
   )
