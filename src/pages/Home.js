@@ -27,7 +27,7 @@ const Home = () => {
         }
         
         // Redirect
-        navigate('/editor/${roomId}',{
+        navigate(`/editor/${roomId}`,{
             state:{
                 userName,
             }
@@ -35,7 +35,7 @@ const Home = () => {
     }
 
     const handleInputEnter = (e) => {
-        if(e.code == 'Enter'){
+        if(e.code === 'Enter'){
             joinRoom();
         }
     }

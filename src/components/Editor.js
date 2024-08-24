@@ -7,7 +7,7 @@ import ACTIONS from '../Actions';
 
 const programmaticChange = Symbol('programmaticChange');
 
-function Editor({ socketRef, roomId }) {
+function Editor({ socketRef, roomId, onCodeChange}) {
   const editorRef = useRef(null);
 
   useEffect(() => {
@@ -22,6 +22,7 @@ function Editor({ socketRef, roomId }) {
           EditorView.updateListener.of((update) => {
             if (update.docChanged) {
               const code = update.state.doc.toString();
+              onCodeChange(code);
               // console.log('Code changed:', code);
 
               update.transactions.forEach(transaction => {
@@ -49,7 +50,7 @@ function Editor({ socketRef, roomId }) {
 
       // Update the document content after initialization
       const updateDoc = (newContent) => {
-        console.log("Updating document with content:", newContent);
+        // console.log("Updating document with content:", newContent);
         view.dispatch({
           changes: { from: 0, to: view.state.doc.length, insert: newContent },
           annotations: [programmaticChange],
@@ -75,9 +76,11 @@ function Editor({ socketRef, roomId }) {
 
     init();
 
+    return () => {
+      socketRef.current.off(ACTIONS.CODE_CHANGE);
+    }
+
   }, [socketRef, roomId]);
-
-
 
   return (
     <div ref={editorRef}></div>

@@ -1,11 +1,17 @@
 const express = require('express');
 const app = express();
 const http = require('http');
+const path = require('path');
 const { Server } = require('socket.io');
 const ACTIONS = require('./src/Actions');
 
 const server = http.createServer(app);
 const io = new Server(server);
+
+app.use(express.static('build'));
+app.use((req, res, next)=>{
+  res.sendFile(path.join(__dirname,'build','index.html'));
+})
 
 const userSocketMap = {};
 
@@ -36,6 +42,7 @@ io.on('connection', (socket) => {
 
     const clients = getAllConnectedClients(roomId);
 
+    // console.log("log",clients)
     clients.forEach(({ socketId }) => {
       io.to(socketId).emit(ACTIONS.JOINED, {
         clients,
@@ -47,11 +54,15 @@ io.on('connection', (socket) => {
 
   socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code }) => {
     if (code) {
-      console.log('Server: CodeUpdated');
-      io.to(roomId).emit(ACTIONS.CODE_CHANGE, {
+      // console.log('Server: CodeUpdated');
+      socket.in(roomId).emit(ACTIONS.CODE_CHANGE, {
         code,
       });
     }
+  });
+
+  socket.on(ACTIONS.SYNC_CODE, ({ code, socketId }) => {
+    io.to(socketId).emit(ACTIONS.CODE_CHANGE,{code});
   });
 
   socket.on('disconnecting', () => {
